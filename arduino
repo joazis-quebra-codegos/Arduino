@@ -1,0 +1,75 @@
+#include <LiquidCrystal_I2C.h>
+#define col 16
+#define lin 2
+#define ende 0x27
+LiquidCrystal_I2C lcd(ende,col,lin);
+
+
+int buzzer = 8; // Atribui o valor 8 a variável buzzer, que representa o pino digital 8, onde o buzzer está conectado
+int i = 0;//Variável para contar o número de vezes que o buzzer tocou
+
+#include <Ultrasonic.h>
+#define pino_trigger 5
+#define pino_echo 4
+
+
+int ledV = 2;
+int ledY = 3;
+int ledR = 4;
+
+
+void setup()
+{
+  //DISPLAY
+  lcd.init();
+  lcd.backlight();
+  lcd.clear();
+
+  //BUZZER
+  pinMode(buzzer, OUTPUT); //Definindo o pino buzzer como de saída.
+
+  //SENSOR
+  Serial.begin(9600);
+  Serial.println("Lendo dados do sensor...");
+
+  //LEDZES
+  pinMode(ledV, OUTPUT);
+  pinMode(ledY, OUTPUT);
+  pinMode(ledR, OUTPUT);
+}
+
+void loop()
+{
+
+
+  float cmMsec, inMsec;
+  long microsec = ultrasonic.timing();
+  cmMsec = ultrasonic.convert(microsec, Ultrasonic::CM);
+  //Exibe informacoes no serial monitor
+  Serial.print("Distancia em cm: ");
+  Serial.print(cmMsec);
+  //Debug ^^^^^^^^^^^^^^^^^^^^^^^^
+  delay(5);
+
+  if (cmMsec > 200){  
+  digitalWrite(ledV, HIGH);
+  Serial.print("Não perigo, não próximo");
+  lcd.setCursor(1,0); lcd.print("SEGURO");
+  delay(250);
+  lcd.clear();
+  }
+  else if (cmMsec < 200){  
+  digitalWrite(ledY, HIGH);
+  Serial.print("Um pouco perigo, um pouco próximo");
+  lcd.setCursor(1,0); lcd.print("MEDIO");
+  delay(250);
+  lcd.clear();
+  }
+  else if (cmMsec < 75){  
+  digitalWrite(ledR, HIGH);
+  Serial.print("Perigo, próximo");
+  lcd.setCursor(1,0); lcd.print("PERIGO");
+  delay(250);
+  lcd.clear();
+  }
+}
