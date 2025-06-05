@@ -11,12 +11,11 @@ int i = 0;//Variável para contar o número de vezes que o buzzer tocou
 #include <Ultrasonic.h>
 #define pino_trigger 5
 #define pino_echo 4
+Ultrasonic ultrasonic(pino_trigger, pino_echo);
 
-
-int ledV = 2;
-int ledY = 3;
-int ledR = 4;
-
+int ledV = 6;
+int ledY = 7;
+int ledR = 8;
 
 void setup()
 {
@@ -41,7 +40,6 @@ void setup()
 void loop()
 {
 
-
   float cmMsec, inMsec;
   long microsec = ultrasonic.timing();
   cmMsec = ultrasonic.convert(microsec, Ultrasonic::CM);
@@ -51,25 +49,32 @@ void loop()
   //Debug ^^^^^^^^^^^^^^^^^^^^^^^^
   delay(5);
 
-  if (cmMsec > 200){  
+  if (cmMsec > 200){ 
+  lcd.clear();  
   digitalWrite(ledV, HIGH);
   Serial.print("Não perigo, não próximo");
   lcd.setCursor(1,0); lcd.print("SEGURO");
-  delay(250);
-  lcd.clear();
+  digitalWrite(buzzer, HIGH); // Liga o buzzer
+  delay(500);
+  digitalWrite(buzzer, LOW); // Liga o buzzer
   }
-  else if (cmMsec < 200){  
+  else if (cmMsec > 75){ 
+  lcd.clear(); 
   digitalWrite(ledY, HIGH);
   Serial.print("Um pouco perigo, um pouco próximo");
   lcd.setCursor(1,0); lcd.print("MEDIO");
-  delay(250);
-  lcd.clear();
+  digitalWrite(buzzer, HIGH); // Liga o buzzer
+  delay(500);
+  digitalWrite(buzzer, LOW); // Liga o buzzer
   }
-  else if (cmMsec < 75){  
+  else{  
+  lcd.clear();
   digitalWrite(ledR, HIGH);
   Serial.print("Perigo, próximo");
-  lcd.setCursor(1,0); lcd.print("PERIGO");
-  delay(250);
-  lcd.clear();
+  lcd.setCursor(1,0); 
+  lcd.print("PERIGO");
+  digitalWrite(buzzer, HIGH); // Liga o buzzer
+  delay(500);
+  digitalWrite(buzzer, LOW); // Liga o buzzer
   }
 }
