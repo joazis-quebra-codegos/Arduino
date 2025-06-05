@@ -4,8 +4,7 @@
 #define ende 0x27
 LiquidCrystal_I2C lcd(ende,col,lin);
 
-
-int buzzer = 9; // Atribui o valor 8 a variável buzzer, que representa o pino digital 8, onde o buzzer está conectado
+int buzzer = 9;
 
 #include <Ultrasonic.h>
 #define pino_trigger 5
@@ -41,39 +40,42 @@ void loop()
   //LEITURA DA DISTANCIA
   float cmMsec;
   long microsec = ultrasonic.timing();
+  Serial.print("microsec = "); Serial.println(microsec);
+  delay(100);
   cmMsec = ultrasonic.convert(microsec, Ultrasonic::CM);
-  //Exibe informacoes no serial monitor
+  //Exibe informacoes no serial monitor 
   Serial.print("Distancia em cm: ");
-  Serial.print(cmMsec);
+  Serial.println(cmMsec);
+  delay(100);
   //Debug ^^^^^^^^^^^^^^^^^^^^^^^^
 
   //CASOS DE DISTANCIA
   if (cmMsec > 200){ 
-  lcd.clear();  
-  digitalWrite(ledV, HIGH);
-  Serial.print("Não perigo, não próximo");
-  lcd.setCursor(1,0); lcd.print("SEGURO");
-  digitalWrite(buzzer, HIGH); // Liga o buzzer
-  delay(500);
-  digitalWrite(buzzer, LOW); // Liga o buzzer
+    lcd.clear();  
+    digitalWrite(ledV, HIGH);
+    Serial.println("Não perigo, não próximo");
+    lcd.setCursor(1,0); lcd.print("SEGURO");
+    digitalWrite(buzzer, HIGH); // Liga o buzzer
+    delay(500);
+    digitalWrite(buzzer, LOW); // Liga o buzzer
   }
   else if (cmMsec > 75){ 
-  lcd.clear(); 
-  digitalWrite(ledY, HIGH);
-  Serial.print("Um pouco perigo, um pouco próximo");
-  lcd.setCursor(1,0); lcd.print("MEDIO");
-  digitalWrite(buzzer, HIGH); // Liga o buzzer
-  delay(500);
-  digitalWrite(buzzer, LOW); // Liga o buzzer
+    lcd.clear(); 
+    digitalWrite(ledY, HIGH);
+    Serial.println("Um pouco perigo, um pouco próximo");
+    lcd.setCursor(1,0); lcd.print("MEDIO");
+    digitalWrite(buzzer, HIGH); // Liga o buzzer
+    delay(500);
+    digitalWrite(buzzer, LOW); // Liga o buzzer
   }
   else{  
-  lcd.clear();
-  digitalWrite(ledR, HIGH);
-  Serial.print("Perigo, próximo");
-  lcd.setCursor(1,0); 
-  lcd.print("PERIGO");
-  digitalWrite(buzzer, HIGH); // Liga o buzzer
-  delay(500);
-  digitalWrite(buzzer, LOW); // Liga o buzzer
+    lcd.clear();
+    digitalWrite(ledR, HIGH);
+    Serial.println("Perigo, próximo");
+    lcd.setCursor(1,0); 
+    lcd.print("PERIGO");
+    digitalWrite(buzzer, HIGH); // Liga o buzzer
+    delay(500);
+    digitalWrite(buzzer, LOW); // Liga o buzzer
   }
 }
