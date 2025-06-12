@@ -2,28 +2,30 @@
 #define col 16
 #define lin 2
 #define ende 0x27
-LiquidCrystal_I2C lcd(ende,col,lin);
+LiquidCrystal_I2C lcd(ende, col, lin);
 
-int buzzer = 9;
 
 #include <Ultrasonic.h>
 #define pino_trigger 5
 #define pino_echo 4
 Ultrasonic ultrasonic(pino_trigger, pino_echo);
 
+int buzzer = 3;
 int ledV = 6;
 int ledY = 7;
 int ledR = 8;
 
-void setup()
-{
+void setup() {
   //DISPLAY
   lcd.init();
   lcd.backlight();
   lcd.clear();
+  lcd.setCursor(1, 0);
+  lcd.print("INICIANDO...");
+  delay(5000);
 
   //BUZZER
-  pinMode(buzzer, OUTPUT); //Definindo o pino buzzer como de saída.
+  pinMode(buzzer, OUTPUT);  //Definindo o pino buzzer como de saída.
 
   //SENSOR
   Serial.begin(9600);
@@ -35,47 +37,52 @@ void setup()
   pinMode(ledR, OUTPUT);
 }
 
-void loop()
-{
+void loop() {
   //LEITURA DA DISTANCIA
   float cmMsec;
   long microsec = ultrasonic.timing();
-  Serial.print("microsec = "); Serial.println(microsec);
+  Serial.print("microsec = ");
+  Serial.println(microsec);
   delay(100);
   cmMsec = ultrasonic.convert(microsec, Ultrasonic::CM);
-  //Exibe informacoes no serial monitor 
+  //Exibe informacoes no serial monitor
   Serial.print("Distancia em cm: ");
   Serial.println(cmMsec);
   delay(100);
   //Debug ^^^^^^^^^^^^^^^^^^^^^^^^
 
   //CASOS DE DISTANCIA
-  if (cmMsec > 200){ 
-    lcd.clear();  
-    digitalWrite(ledV, HIGH);
-    Serial.println("Não perigo, não próximo");
-    lcd.setCursor(1,0); lcd.print("SEGURO");
-    digitalWrite(buzzer, HIGH); // Liga o buzzer
-    delay(500);
-    digitalWrite(buzzer, LOW); // Liga o buzzer
-  }
-  else if (cmMsec > 75){ 
-    lcd.clear(); 
-    digitalWrite(ledY, HIGH);
-    Serial.println("Um pouco perigo, um pouco próximo");
-    lcd.setCursor(1,0); lcd.print("MEDIO");
-    digitalWrite(buzzer, HIGH); // Liga o buzzer
-    delay(500);
-    digitalWrite(buzzer, LOW); // Liga o buzzer
-  }
-  else{  
+  if (cmMsec > 30) {
     lcd.clear();
-    digitalWrite(ledR, HIGH);
+    Serial.println("Não perigo, não próximo");
+    lcd.setCursor(1, 0);
+    lcd.print("SEGURO");
+    lcd.setCursor(1, 1);
+    lcd.print(cmMsec);
+    digitalWrite(ledR, HIGH);  // Liga o buzzer
+    delay(1000);
+    digitalWrite(ledR, LOW);  // Liga o buzzer
+  } else if (cmMsec > 20) {
+    lcd.clear();
+    Serial.println("Um pouco perigo, um pouco próximo");
+    lcd.setCursor(1, 0);
+    lcd.print("MEDIO");
+    lcd.setCursor(1, 1);
+    lcd.print(cmMsec);
+    digitalWrite(ledY, HIGH);  // Liga o buzzer
+    delay(1000); 
+    digitalWrite(ledY, LOW);  // Liga o buzzer
+  } else {
+    lcd.clear();
+    tone(buzzer, 3500);
     Serial.println("Perigo, próximo");
-    lcd.setCursor(1,0); 
+    lcd.setCursor(1, 0);
     lcd.print("PERIGO");
-    digitalWrite(buzzer, HIGH); // Liga o buzzer
-    delay(500);
-    digitalWrite(buzzer, LOW); // Liga o buzzer
+    lcd.setCursor(1, 1);
+    lcd.print(cmMsec);
+    digitalWrite(ledV, HIGH);  // Liga o buzzer
+    delay(1000);
+    noTone(buzzer); 
+    digitalWrite(ledV, LOW);  // Liga o buzzer
   }
 }
